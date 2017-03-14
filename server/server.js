@@ -1,3 +1,4 @@
+const {ObjectID} = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -30,6 +31,39 @@ app.get('/todos', (req, res) => {
     });
 });
 
+
+//  GET /todos/12121
+app.get('/todos/:id', (req, res) => {
+    //res.send(req.params);
+    var id = req.params.id;
+
+    //valid id using invalid 
+        //404 = send back empty send: res.status(404).send(e);
+    if (!ObjectID.isValid(id)) {
+        console.log('ID is not valid');
+        return res.status(404).send();
+    }
+
+    //findById
+        //success
+            //if todo - end it back
+            //if no todo - send back 404 with empty body
+        //error
+            //400 - and send empty body back
+    Todo.findById(id).then((todo) => {
+        if (!todo) {
+            console.log('Todo not found');
+            return res.status(404).send();
+        }
+        
+        console.log('Todo By Id', todo);
+        res.send({todo});
+    }).catch((e) => {
+        console.log('ID is not Found');
+        return res.status(400).send();
+    });
+
+});
 
 app.listen(3000, () => {
     console.log('Started on port 3000');
